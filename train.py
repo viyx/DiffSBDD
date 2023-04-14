@@ -115,8 +115,9 @@ if __name__ == "__main__":
         callbacks=[checkpoint_callback],
         enable_progress_bar=args.enable_progress_bar,
         num_sanity_val_steps=args.num_sanity_val_steps,
-        accelerator='gpu', devices=args.gpus,
-        strategy=('ddp' if args.gpus > 1 else None)
+        accelerator='cpu',
+        #   devices=args.gpus,
+        strategy=('ddp' if args.gpus > 1 else 'auto')
     )
 
     trainer.fit(model=pl_module, ckpt_path=ckpt_path)

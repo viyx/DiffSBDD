@@ -1,11 +1,11 @@
 run_name: 'crossdocked_full_cond'
-logdir: '/path/to/logdir/'
+logdir: './logs/'
 wandb_params:
-  mode: 'online'  # disabled, offline, online
+  mode: 'disabled' #'online'  # disabled, offline, online
   entity: 'my_wandb_entity'
-dataset: 'crossdocked'
-datadir: '/path/to/processed_crossdock_noH_full_temp'
-enable_progress_bar: False
+dataset: 'crossdock_full'
+datadir: './data/crossdocked/processed_crossdock_noH_full_temp'
+enable_progress_bar: True
 num_sanity_val_steps: 0
 
 mode: 'pocket_conditioning'
@@ -30,7 +30,7 @@ egnn_params:
   edge_cutoff: 7.0
   joint_nf: 32
   hidden_nf: 256
-  n_layers: 6
+  n_layers: 2
   attention: True
   tanh: True
   norm_constant: 1
@@ -40,7 +40,7 @@ egnn_params:
   normalization_factor: 100  # used if aggregation_method='sum'
 
 diffusion_params:
-  diffusion_steps: 1000
+  diffusion_steps: 10
   diffusion_noise_schedule: 'polynomial_2'
   diffusion_noise_precision: 1.0e-5
   diffusion_loss_type: 'l2'
@@ -52,6 +52,6 @@ visualize_chain_epoch: 25
 eval_params:
   n_eval_samples: 100
   eval_batch_size: 100
-  smiles_file: '/path/to/processed_crossdock_noH_full_temp/train_smiles.npy'
+  smiles_file: './data/crossdocked/processed_crossdock_noH_full_temp/train_smiles.npy'
   n_visualize_samples: 5
   keep_frames: 100

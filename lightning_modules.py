@@ -343,7 +343,7 @@ class LigandPocketDDPM(pl.LightningModule):
     def test_step(self, data, *args):
         self._shared_eval(data, 'test', *args)
 
-    def validation_epoch_end(self, validation_step_outputs):
+    def on_validation_epoch_end(self, validation_step_outputs):
 
         # Perform validation on single GPU
         # TODO: sample on multiple devices if available
