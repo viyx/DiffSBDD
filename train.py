@@ -116,7 +116,6 @@ if __name__ == "__main__":
         enable_progress_bar=args.enable_progress_bar,
         num_sanity_val_steps=args.num_sanity_val_steps,
         accelerator='cpu',
-        #   devices=args.gpus,
         strategy=('ddp' if args.gpus > 1 else 'auto')
     )
 

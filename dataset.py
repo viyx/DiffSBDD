@@ -1,6 +1,9 @@
 import os
+import pickle
+
 import numpy as np
 import torch
+from torch.nn.functional import one_hot
 from torch.utils.data import Dataset
 
 
@@ -64,4 +67,64 @@ class ProcessedLigandPocketDataset(Dataset):
             else:
                 out[prop] = torch.cat([x[prop] for x in batch], dim=0)
 
+        return out
+
+
+class ARCFillingDataset(Dataset):
+    def __init__(self, path):
+
+        with open(path, 'rb') as f:
+            self.raw_data = pickle.load(f)
+
+        categories = set()
+        for datum in self.raw_data:
+            categories |= set(np.unique(datum['x'].flatten()).tolist())
+            categories |= set(np.unique(datum['y'].flatten()).tolist())
+        
+        assert max(categories) == len(categories) - 1
+        self.categories = categories
+
+    def __len__(self):
+        return len(self.raw_data)
+
+    def __getitem__(self, idx):
+        return self.raw_data[idx]
+
+    def collate_fn(self, batch):
+        out = {}
+
+        pocket_mask = []
+        pocket_c_alpha = []
+        pocket_one_hot = []
+        num_pocket_nodes = []
+        lig_mask = []
+        lig_coords = []
+        lig_one_hot = []
+        num_lig_atoms = []
+
+
+        for i, pair in enumerate(batch):
+            x, y = pair['x'], pair['y']
+            x_flat, y_flat = x.flatten(), y.flatten()
+
+            pocket_mask.append(i * torch.ones(len(x_flat)))
+            lig_mask.append(i * torch.ones(len(y_flat)))
+
+            pocket_c_alpha.append(torch.cartesian_prod(torch.arange(0,x.shape[0]), torch.arange(0,x.shape[1])))
+            lig_coords.append(torch.cartesian_prod(torch.arange(0,x.shape[0]), torch.arange(0,x.shape[1])))
+
+            pocket_one_hot.append(one_hot(torch.tensor(x_flat), len(self.categories)))
+            lig_one_hot.append(one_hot(torch.tensor(y_flat), len(self.categories)))
+
+            num_pocket_nodes.append(len(x_flat))
+            num_lig_atoms.append(len(y_flat))
+        
+        out['pocket_mask'] = torch.cat(pocket_mask)
+        out['lig_mask'] = torch.cat(lig_mask)
+        out['pocket_c_alpha'] = torch.cat(pocket_c_alpha, axis=0)
+        out['lig_coords'] = torch.cat(lig_coords, axis=0)
+        out['pocket_one_hot'] = torch.cat(pocket_one_hot, axis=0)
+        out['lig_one_hot'] = torch.cat(lig_one_hot, axis=0)
+        out['num_pocket_nodes'] = torch.tensor(num_pocket_nodes)
+        out['num_lig_atoms'] = torch.tensor(num_lig_atoms)
         return out

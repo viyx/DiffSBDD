@@ -19,7 +19,7 @@ from equivariant_diffusion.dynamics import EGNNDynamics
 from equivariant_diffusion.en_diffusion import EnVariationalDiffusion
 from equivariant_diffusion.conditional_model import ConditionalDDPM, \
     SimpleConditionalDDPM
-from dataset import ProcessedLigandPocketDataset
+from dataset import ProcessedLigandPocketDataset, ARCFillingDataset
 import utils
 from analysis.visualization import save_xyz_file, visualize, visualize_chain
 from analysis.metrics import check_stability, BasicMolecularMetrics, \
@@ -85,10 +85,10 @@ class LigandPocketDDPM(pl.LightningModule):
             # Add large value that will be flushed.
             self.gradnorm_queue.add(3000)
 
-        smiles_list = None if eval_params.smiles_file is None \
-            else np.load(eval_params.smiles_file)
-        self.ligand_metrics = BasicMolecularMetrics(self.dataset_info,
-                                                    smiles_list)
+        # smiles_list = None if eval_params.smiles_file is None \
+        #     else np.load(eval_params.smiles_file)
+        # self.ligand_metrics = BasicMolecularMetrics(self.dataset_info,
+        #                                             smiles_list)
         self.ligand_type_distribution = CategoricalDistribution(
             self.dataset_info['atom_hist'], self.dataset_info['atom_encoder'])
         if self.pocket_representation == 'CA':
@@ -113,7 +113,7 @@ class LigandPocketDDPM(pl.LightningModule):
 
         self.atom_nf = len(self.lig_type_decoder)
         self.aa_nf = len(self.pocket_type_decoder)
-        self.x_dims = 3
+        self.x_dims = self.dataset_info['x_dims']
 
         net_dynamics = EGNNDynamics(
             atom_nf=self.atom_nf,
@@ -161,10 +161,16 @@ class LigandPocketDDPM(pl.LightningModule):
 
     def setup(self, stage: Optional[str] = None):
         if stage == 'fit':
-            self.train_dataset = ProcessedLigandPocketDataset(
-                Path(self.datadir, 'train.npz'))
-            self.val_dataset = ProcessedLigandPocketDataset(
-                Path(self.datadir, 'val.npz'))
+            if self.dataset_name == 'arc_filling':
+                self.train_dataset = ARCFillingDataset(
+                    Path(self.datadir, 'train.pkl'))
+                self.val_dataset = ARCFillingDataset(
+                    Path(self.datadir, 'val.pkl'))
+            else:
+                self.train_dataset = ProcessedLigandPocketDataset(
+                    Path(self.datadir, 'train.npz'))
+                self.val_dataset = ProcessedLigandPocketDataset(
+                    Path(self.datadir, 'val.npz'))
         elif stage == 'test':
             self.test_dataset = ProcessedLigandPocketDataset(
                 Path(self.datadir, 'test.npz'))
@@ -824,7 +830,7 @@ class LigandPocketDDPM(pl.LightningModule):
 
         return molecules
 
-    def configure_gradient_clipping(self, optimizer, optimizer_idx,
+    def configure_gradient_clipping(self, optimizer,
                                     gradient_clip_val, gradient_clip_algorithm):
 
         if not self.clip_grad:
