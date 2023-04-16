@@ -115,7 +115,7 @@ if __name__ == "__main__":
         callbacks=[checkpoint_callback],
         enable_progress_bar=args.enable_progress_bar,
         num_sanity_val_steps=args.num_sanity_val_steps,
-        accelerator='cpu',
+        accelerator=('gpu' if args.gpus > 0 else 'cpu'),
         strategy=('ddp' if args.gpus > 1 else 'auto')
     )
 
