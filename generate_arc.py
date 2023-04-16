@@ -1,3 +1,4 @@
+import os
 import pickle
 from collections import Counter
 
@@ -45,6 +46,7 @@ if __name__ == '__main__':
 
 
     data_folder = './data/arc/'
+    os.makedirs(data_folder)
 
 
     train, val = int(0.8 * len(data)), int(0.1 * len(data))
