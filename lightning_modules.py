@@ -321,7 +321,7 @@ class LigandPocketDDPM(pl.LightningModule):
 
         info['loss'] = loss
         self.log_metrics(info, 'train', batch_size=len(data['num_lig_atoms']))
-        # self.log("loss", loss, prog_bar=True)
+        self.log("loss", loss, prog_bar=True)
 
         return info
 
@@ -855,10 +855,10 @@ class LigandPocketDDPM(pl.LightningModule):
         else:
             self.gradnorm_queue.add(float(grad_norm))
 
-        if float(grad_norm) > max_grad_norm:
-            pass
-            print(f'Clipped gradient with value {grad_norm:.1f} '
-                  f'while allowed {max_grad_norm:.1f}')
+        # if float(grad_norm) > max_grad_norm:
+            
+        #     print(f'Clipped gradient with value {grad_norm:.1f} '
+        #           f'while allowed {max_grad_norm:.1f}')
 
 
 class WeightSchedule:
