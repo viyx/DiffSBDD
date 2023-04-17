@@ -10,11 +10,11 @@ num_sanity_val_steps: 0
 
 mode: 'pocket_conditioning'
 pocket_representation: 'full-atom'
-batch_size: 32
+batch_size: 8
 lr: 1.0e-4
-n_epochs: 1
+n_epochs: 20
 num_workers: 1
-gpus: 0
+acc: 'gpu'
 clip_grad: True
 augment_rotation: False
 augment_noise: 0
@@ -28,8 +28,8 @@ loss_params:
 egnn_params:
   device: 'cpu'
   edge_cutoff: 7.0
-  joint_nf: 32
-  hidden_nf: 256
+  joint_nf: 16
+  hidden_nf: 32
   n_layers: 2
   attention: True
   tanh: True

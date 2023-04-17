@@ -45,6 +45,7 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument('--config', type=str, required=True)
     p.add_argument('--resume', type=str, default=None)
+    p.add_argument('--acc', type=str)
     args = p.parse_args()
 
     with open(args.config, 'r') as f:
@@ -115,8 +116,7 @@ if __name__ == "__main__":
         callbacks=[checkpoint_callback],
         enable_progress_bar=args.enable_progress_bar,
         num_sanity_val_steps=args.num_sanity_val_steps,
-        accelerator=('gpu' if args.gpus > 0 else 'cpu'),
-        strategy=('ddp' if args.gpus > 1 else 'auto')
+        accelerator=args.acc
     )
 
     trainer.fit(model=pl_module, ckpt_path=ckpt_path)
