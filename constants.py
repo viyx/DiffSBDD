@@ -173,7 +173,7 @@ dataset_params['arc_filling'] = {
       'aa_encoder':  {'0': 0, '1': 1, '2': 2},
       'aa_decoder': ['0', '1', '2'],
       'colors_dic': [ 
-            "#000000",
+            "#D3D3D3",
             "#0074D9",
             "#FF4136",
             "#2ECC40",

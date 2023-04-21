@@ -232,7 +232,7 @@ def plot_data2d_100x100(positions, atom_type, dataset_info, save_path):
 
     cmap = colors.ListedColormap(dataset_info['colors_dic'])
     norm = colors.Normalize(vmin=0, vmax=len(dataset_info['colors_dic']))
-    _, axs = plt.subplots(2, 1, figsize=(3 * 1, 3 * 2))
+    _, axs = plt.subplots(1, 2, figsize=(3 * 2, 3 * 1))
     axs[0].scatter(pocket[:,0], pocket[:,1], c=atom_type[:100], cmap=cmap, norm=norm)
     axs[1].scatter(lig[:,0], lig[:,1], c=atom_type[100:], cmap=cmap, norm=norm)
     plt.savefig(save_path)

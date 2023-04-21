@@ -337,33 +337,40 @@ class ARCLigandPocketDDPM(pl.LightningModule):
         self._shared_eval(data, 'test', *args)
 
     def sample_and_save_given_pocket(self, n_samples):
-        batch = self.val_dataset.collate_fn(
+        val_batch = self.val_dataset.collate_fn(
             [self.val_dataset[i] for i in torch.randint(len(self.val_dataset),
                                                         size=(n_samples,))]
         )
-        ligand, pocket = self.get_ligand_and_pocket(batch)
 
-        num_nodes_lig = self.ddpm.size_distribution.sample_conditional(
-            n1=None, n2=pocket['size'])
+        tr_batch = self.train_dataset.collate_fn(
+            [self.train_dataset[i] for i in torch.randint(len(self.train_dataset),
+                                                        size=(n_samples,))]
+        )
 
-        xh_lig, xh_pocket, lig_mask, pocket_mask = \
-            self.ddpm.sample_given_pocket(pocket, num_nodes_lig)
+        for batch, suffix in zip([val_batch, tr_batch], ['val', 'train']):
+            ligand, pocket = self.get_ligand_and_pocket(batch)
 
-        # if self.pocket_representation == 'CA':
-        #     # convert residues into atom representation for visualization
-        #     x_pocket, one_hot_pocket = utils.residues_to_atoms(
-        #         xh_pocket[:, :self.x_dims], self.dataset_info)
-        # else:
-        x_pocket, one_hot_pocket = \
-            xh_pocket[:, :self.x_dims], ligand['one_hot']
-        x = torch.cat((xh_lig[:, :self.x_dims], x_pocket), dim=0)
-        one_hot = torch.cat((xh_lig[:, self.x_dims:], one_hot_pocket), dim=0)
+            num_nodes_lig = self.ddpm.size_distribution.sample_conditional(
+                n1=None, n2=pocket['size'])
 
-        outdir = Path(self.outdir, f'epoch_{self.current_epoch}')
-        save_x_file(str(outdir) + '/', one_hot, x, self.dataset_info,
-                      name='molecule',
-                      batch_mask=torch.cat((lig_mask, pocket_mask)))
-        visualize2d(str(outdir), dataset_info=self.dataset_info)
+            xh_lig, xh_pocket, lig_mask, pocket_mask = \
+                self.ddpm.sample_given_pocket(pocket, num_nodes_lig, return_frames=1)
+
+            # if self.pocket_representation == 'CA':
+            #     # convert residues into atom representation for visualization
+            #     x_pocket, one_hot_pocket = utils.residues_to_atoms(
+            #         xh_pocket[:, :self.x_dims], self.dataset_info)
+            # else:
+            x_pocket, one_hot_pocket = \
+                xh_pocket[:, :self.x_dims], ligand['one_hot']
+            x = torch.cat((xh_lig[:, :self.x_dims], x_pocket), dim=0)
+            one_hot = torch.cat((xh_lig[:, self.x_dims:], one_hot_pocket), dim=0)
+
+            outdir = Path(self.outdir, f'epoch_{self.current_epoch}')
+            save_x_file(str(outdir) + '/', one_hot, x, self.dataset_info,
+                        name='molecule_'+suffix,
+                        batch_mask=torch.cat((lig_mask, pocket_mask)))
+            visualize2d(str(outdir), dataset_info=self.dataset_info)
 
     def on_validation_epoch_end(self):
 
@@ -373,9 +380,9 @@ class ARCLigandPocketDDPM(pl.LightningModule):
             return
 
         if (self.current_epoch + 1) % self.visualize_sample_epoch == 0:
-            tic = time()
+            # tic = time()
             self.sample_and_save_given_pocket(self.eval_params.n_visualize_samples)
-            print(f'Sample visualization took {time() - tic:.2f} seconds')
+            # print(f'Sample visualization took {time() - tic:.2f} seconds')
 
 
     def generate_ligands(self, pdb_file, n_samples, pocket_ids=None,
