@@ -148,6 +148,8 @@ class ARCLigandPocketDDPM(pl.LightningModule):
             self.auxiliary_weight_schedule = WeightSchedule(
                 T=diffusion_params.diffusion_steps,
                 max_weight=loss_params.max_weight, mode=loss_params.schedule)
+        
+        self.viz_val_indices, self.viz_train_indices = None, None
 
     def configure_optimizers(self):
         return torch.optim.AdamW(self.ddpm.parameters(), lr=self.lr,
@@ -159,6 +161,15 @@ class ARCLigandPocketDDPM(pl.LightningModule):
                 Path(self.datadir, 'train.pkl'))
             self.val_dataset = ARCFillingDataset(
                 Path(self.datadir, 'val.pkl'))
+            
+            g_cpu = torch.Generator('cpu')
+            g_cpu.manual_seed(888)
+
+            self.viz_val_indices = torch.randint(len(self.val_dataset),
+                                size=(self.eval_params.n_visualize_samples,), generator=g_cpu)
+            
+            self.viz_train_indices = torch.randint(len(self.train_dataset),
+                                size=(self.eval_params.n_visualize_samples,), generator=g_cpu)
         else:
             raise NotImplementedError
 
@@ -336,18 +347,13 @@ class ARCLigandPocketDDPM(pl.LightningModule):
     def test_step(self, data, *args):
         self._shared_eval(data, 'test', *args)
 
-    def sample_and_save_given_pocket(self, n_samples):
+    def sample_and_save_given_pocket(self):
         val_batch = self.val_dataset.collate_fn(
-            [self.val_dataset[i] for i in torch.randint(len(self.val_dataset),
-                                                        size=(n_samples,))]
-        )
-
-        tr_batch = self.train_dataset.collate_fn(
-            [self.train_dataset[i] for i in torch.randint(len(self.train_dataset),
-                                                        size=(n_samples,))]
-        )
-
-        for batch, suffix in zip([val_batch, tr_batch], ['val', 'train']):
+            [self.val_dataset[i] for i in self.viz_val_indices])
+        train_batch = self.train_dataset.collate_fn(
+            [self.train_dataset[i] for i in self.viz_train_indices])
+        
+        for batch, suffix in zip([val_batch, train_batch], ['val', 'train']):
             ligand, pocket = self.get_ligand_and_pocket(batch)
 
             num_nodes_lig = self.ddpm.size_distribution.sample_conditional(
@@ -381,7 +387,7 @@ class ARCLigandPocketDDPM(pl.LightningModule):
 
         if (self.current_epoch + 1) % self.visualize_sample_epoch == 0:
             # tic = time()
-            self.sample_and_save_given_pocket(self.eval_params.n_visualize_samples)
+            self.sample_and_save_given_pocket()
             # print(f'Sample visualization took {time() - tic:.2f} seconds')
 
 

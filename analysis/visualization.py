@@ -375,7 +375,7 @@ def visualize2d(path, dataset_info, max_num=25):
         # Log image(s)
         im = plt.imread(path)
         filename = os.path.basename(path)
-        wandb.log({filename: [wandb.Image(im, caption=path)]})
+        wandb.log({filename: [wandb.Image(im, caption=filename)]})
 
 
 def visualize_chain(path, dataset_info, wandb=None, spheres_3d=False,
