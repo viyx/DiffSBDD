@@ -3,7 +3,7 @@ logdir: './logs/'
 wandb_params:
   mode: 'online' #'online'  # disabled, offline, online
   # entity: 'test_entity'
-  tags: 'mac'
+  tags: 'colab'
 dataset: 'arc_filling'
 datadir: './data/arc/'
 enable_progress_bar: True
