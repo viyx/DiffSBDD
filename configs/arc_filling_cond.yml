@@ -1,8 +1,9 @@
 run_name: 'arc_filling_cond'
 logdir: './logs/'
 wandb_params:
-  mode: 'disabled' #'online'  # disabled, offline, online
-  entity: 'my_wandb_entity'
+  mode: 'online' #'online'  # disabled, offline, online
+  # entity: 'test_entity'
+  tags: 'mac'
 dataset: 'arc_filling'
 datadir: './data/arc/'
 enable_progress_bar: True
@@ -10,10 +11,10 @@ num_sanity_val_steps: 0
 
 mode: 'pocket_conditioning'
 pocket_representation: 'full-atom'
-batch_size: 8
+batch_size: 64
 lr: 1.0e-4
 n_epochs: 20
-num_workers: 1
+num_workers: 2
 acc: 'gpu'
 clip_grad: True
 augment_rotation: False
@@ -26,8 +27,8 @@ loss_params:
   clamp_lj: 3.0
 
 egnn_params:
-  device: 'cpu'
-  edge_cutoff: 7.0
+  # device: 'gpu'
+  edge_cutoff: 3.0
   joint_nf: 16
   hidden_nf: 32
   n_layers: 2
@@ -40,18 +41,18 @@ egnn_params:
   normalization_factor: 100  # used if aggregation_method='sum'
 
 diffusion_params:
-  diffusion_steps: 10
+  diffusion_steps: 1000
   diffusion_noise_schedule: 'polynomial_2'
   diffusion_noise_precision: 1.0e-5
   diffusion_loss_type: 'l2'
-  normalize_factors: [1, 4]  # [x, h]
+  normalize_factors: [1, 1]  # [x, h]
 
-eval_epochs: 25
-visualize_sample_epoch: 25
-visualize_chain_epoch: 25
+eval_epochs: 250
+visualize_sample_epoch: 1
+visualize_chain_epoch: 1
 eval_params:
   n_eval_samples: 100
-  eval_batch_size: 100
+  eval_batch_size: 1
   smiles_file: './data/arc/'
-  n_visualize_samples: 5
-  keep_frames: 100
+  n_visualize_samples: 2
+  keep_frames: 10

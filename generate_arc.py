@@ -1,14 +1,19 @@
 import os
 import pickle
+import argparse
 from collections import Counter
 
 import numpy as np
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--n', type=int, default=10000)
+
+    args = parser.parse_args()
     rect_size = 10
-    max_figs = 5
-    n = 10_000
+    max_figs = 2
+    n = args.n
 
     # summetry, odds
     figs = [
@@ -46,7 +51,7 @@ if __name__ == '__main__':
 
 
     data_folder = './data/arc/'
-    os.makedirs(data_folder)
+    os.makedirs(data_folder, exist_ok=True)
 
 
     train, val = int(0.8 * len(data)), int(0.1 * len(data))

@@ -8,7 +8,7 @@ import pytorch_lightning as pl
 import yaml
 import numpy as np
 
-from lightning_modules import LigandPocketDDPM
+from lightning_modules import ARCLigandPocketDDPM
 
 
 def merge_args_and_yaml(args, config_dict):
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     out_dir = Path(args.logdir, args.run_name)
     histogram_file = Path(args.datadir, 'size_distribution.npy')
     histogram = np.load(histogram_file).tolist()
-    pl_module = LigandPocketDDPM(
+    pl_module = ARCLigandPocketDDPM(
         outdir=out_dir,
         dataset=args.dataset,
         datadir=args.datadir,
@@ -84,7 +84,7 @@ if __name__ == "__main__":
         visualize_chain_epoch=args.visualize_chain_epoch,
         auxiliary_loss=args.auxiliary_loss,
         loss_params=args.loss_params,
-        mode=args.mode,
+        # mode=args.mode,
         node_histogram=histogram,
         pocket_representation=args.pocket_representation
     )
@@ -93,11 +93,13 @@ if __name__ == "__main__":
         save_dir=args.logdir,
         project='ligand-pocket-ddpm',
         group=args.dataset,
-        name=args.run_name,
+        # name=args.run_name,
         id=args.run_name,
         resume='must' if args.resume is not None else False,
-        entity=args.wandb_params.entity,
+        tags=[args.wandb_params.tags],
+        # entity=args.wandb_params.entity,
         mode=args.wandb_params.mode,
+        
     )
 
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
