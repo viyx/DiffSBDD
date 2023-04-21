@@ -30,8 +30,20 @@ class ARCEGNNDynamics(nn.Module):
             nn.Linear(2 * atom_nf, atom_nf)
         )
 
-        self.residue_encoder = self.atom_encoder
-        self.residue_decoder = self.atom_decoder
+        self.residue_encoder = nn.Sequential(
+            nn.Linear(atom_nf, 2 * atom_nf),
+            act_fn,
+            nn.Linear(2 * atom_nf, joint_nf)
+        )
+
+        self.residue_decoder = nn.Sequential(
+            nn.Linear(joint_nf, 2 * atom_nf),
+            act_fn,
+            nn.Linear(2 * atom_nf, atom_nf)
+        )
+
+        # self.residue_encoder = self.atom_encoder
+        # self.residue_decoder = self.atom_decoder
 
         if condition_time:
             dynamics_node_nf = joint_nf + 1
