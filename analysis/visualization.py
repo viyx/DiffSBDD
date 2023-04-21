@@ -366,7 +366,7 @@ def visualize2d(path, dataset_info, max_num=25):
         dists = torch.cdist(positions.unsqueeze(0),
                             positions.unsqueeze(0)).squeeze(0)
         dists = dists[dists > 0]
-        print("Average distance between atoms", dists.mean().item())
+        # print("Average distance between atoms", dists.mean().item())
 
         plot_data2d_100x100(positions, atom_type, dataset_info=dataset_info,
                     save_path=file[:-4] + '.png')
@@ -374,7 +374,7 @@ def visualize2d(path, dataset_info, max_num=25):
         path = file[:-4] + '.png'
         # Log image(s)
         im = plt.imread(path)
-        wandb.log({'molecule': [wandb.Image(im, caption=path)]})
+        wandb.log({file[:-4]: [wandb.Image(im, caption=path)]})
 
 
 def visualize_chain(path, dataset_info, wandb=None, spheres_3d=False,

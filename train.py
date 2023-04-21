@@ -92,10 +92,10 @@ if __name__ == "__main__":
     logger = pl.loggers.WandbLogger(
         save_dir=args.logdir,
         project='ligand-pocket-ddpm',
-        group=args.dataset,
+        group=args.run_name,
         # name=args.run_name,
-        id=args.run_name,
-        resume='must' if args.resume is not None else False,
+        # id=args.run_name,
+        # resume='must' if args.resume is not None else False,
         tags=[args.wandb_params.tags],
         # entity=args.wandb_params.entity,
         mode=args.wandb_params.mode,
