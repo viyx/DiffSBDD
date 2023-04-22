@@ -3,7 +3,7 @@ logdir: './logs/'
 wandb_params:
   mode: 'online' #'online'  # disabled, offline, online
   # entity: 'test_entity'
-  tags: 'colab'
+  tags: 'mac'
 dataset: 'arc_filling'
 datadir: './data/arc/'
 enable_progress_bar: True
@@ -29,8 +29,8 @@ loss_params:
 egnn_params:
   # device: 'gpu'
   edge_cutoff: 7.0
-  joint_nf: 32
-  hidden_nf: 256
+  joint_nf: 16
+  hidden_nf: 32
   n_layers: 2
   attention: True
   tanh: True

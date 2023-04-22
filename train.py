@@ -45,7 +45,7 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument('--config', type=str, required=True)
     p.add_argument('--resume', type=str, default=None)
-    p.add_argument('--acc', type=str)
+
     args = p.parse_args()
 
     with open(args.config, 'r') as f:
