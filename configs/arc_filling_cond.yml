@@ -11,9 +11,9 @@ num_sanity_val_steps: 0
 
 mode: 'pocket_conditioning'
 pocket_representation: 'full-atom'
-batch_size: 8
+batch_size: 32
 lr: 1.0e-4
-n_epochs: 20
+n_epochs: 1000
 num_workers: 2
 acc: 'gpu'
 clip_grad: True
@@ -28,12 +28,12 @@ loss_params:
 
 egnn_params:
   # device: 'gpu'
-  edge_cutoff: 3.0
-  joint_nf: 16
-  hidden_nf: 32
+  edge_cutoff: 7.0
+  joint_nf: 32
+  hidden_nf: 256
   n_layers: 2
   attention: True
-  tanh: False
+  tanh: True
   norm_constant: 1
   inv_sublayers: 1
   sin_embedding: False
@@ -41,13 +41,13 @@ egnn_params:
   normalization_factor: 100  # used if aggregation_method='sum'
 
 diffusion_params:
-  diffusion_steps: 100
+  diffusion_steps: 10
   diffusion_noise_schedule: 'polynomial_2'
   diffusion_noise_precision: 1.0e-5
   diffusion_loss_type: 'l2'
-  normalize_factors: [1, 1]  # [x, h]
+  normalize_factors: [1, 4]  # [x, h]
 
-eval_epochs: 250
+eval_epochs: 25000
 visualize_sample_epoch: 1
 visualize_chain_epoch: 1
 eval_params:
