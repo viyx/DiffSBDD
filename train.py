@@ -103,12 +103,13 @@ if __name__ == "__main__":
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
         dirpath=ckpt_dir,
         filename=ckpt_filename,
+        verbose=True,
         # filename="last-model-epoch={epoch:02d}",
-        # monitor="loss/val",
-        # save_top_k=1,
-        # save_last=True,
-        # mode="min",
-        every_n_epochs=1,
+        monitor="loss/val",
+        save_top_k=1,
+        save_last=True,
+        mode="min",
+        # every_n_epochs=1,
     )
 
     trainer = pl.Trainer(
@@ -130,9 +131,7 @@ if __name__ == "__main__":
 
         # wandb ckpt
         elif logger.experiment.resumed:
-            e = logger.experiment.entity
-            p = logger.experiment.project
-            art = logger.experiment.use_artifact(f"{e}/{p}/model-{run_id}:v0", type="model")
+            art = logger.experiment.use_artifact(f"model-{run_id}:latest", type="model")
             wandb_ckpt_dir = art.download()
             ckpt_path = Path(wandb_ckpt_dir, 'model.ckpt')
         else:
