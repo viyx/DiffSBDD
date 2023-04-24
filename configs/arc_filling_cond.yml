@@ -1,12 +1,10 @@
 run_name: 'arc_filling_cond'
 logdir: './logs/'
-resume: True
+resume: False
 wandb_params:
   mode: 'online' #'online'  # disabled, offline, online
-  # entity: 'test_entity'
-  tags: 'mac'
-  # resume: 'must'
-  run_id: 'u1jniql5'
+  tags: 'colab'
+  run_id: 
 dataset: 'arc_filling'
 datadir: './data/arc/'
 enable_progress_bar: True
@@ -14,7 +12,7 @@ num_sanity_val_steps: 0
 
 mode: 'pocket_conditioning'
 pocket_representation: 'full-atom'
-batch_size: 8
+batch_size: 32
 lr: 1.0e-4
 n_epochs: 1000
 num_workers: 2
@@ -32,14 +30,14 @@ loss_params:
 egnn_params:
   # device: 'gpu'
   edge_cutoff: 7.0
-  joint_nf: 16
-  hidden_nf: 16
+  joint_nf: 32
+  hidden_nf: 128
   n_layers: 2
   attention: True
   tanh: True
   norm_constant: 1
   inv_sublayers: 1
-  sin_embedding: False
+  sin_embedding: True
   aggregation_method: 'sum'
   normalization_factor: 100  # used if aggregation_method='sum'
 
