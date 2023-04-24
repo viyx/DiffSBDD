@@ -3,8 +3,8 @@ from argparse import Namespace
 from pathlib import Path
 import warnings
 
-import torch
 import pytorch_lightning as pl
+import wandb
 import yaml
 import numpy as np
 
@@ -44,26 +44,20 @@ def merge_configs(config, resume_config):
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument('--config', type=str, required=True)
-    p.add_argument('--resume', type=str, default=None)
 
     args = p.parse_args()
 
     with open(args.config, 'r') as f:
         config = yaml.safe_load(f)
 
-    assert 'resume' not in config
-
-    # Get main config
-    ckpt_path = None if args.resume is None else Path(args.resume)
-    if args.resume is not None:
-        resume_config = torch.load(
-            ckpt_path, map_location=torch.device('cpu'))['hyper_parameters']
-
-        config = merge_configs(config, resume_config)
-
     args = merge_args_and_yaml(args, config)
 
-    out_dir = Path(args.logdir, args.run_name)
+    if args.wandb_params.run_id and not args.resume:
+        raise ValueError('Cannot use runid explicitly without resuming.')
+
+    run_id = args.wandb_params.run_id or wandb.util.generate_id()
+    out_dir = Path(args.logdir, args.run_name, run_id)
+
     histogram_file = Path(args.datadir, 'size_distribution.npy')
     histogram = np.load(histogram_file).tolist()
     pl_module = ARCLigandPocketDDPM(
@@ -89,27 +83,32 @@ if __name__ == "__main__":
         pocket_representation=args.pocket_representation
     )
 
+    ckpt_filename = 'last'
+    ckpt_dir = Path(out_dir, 'checkpoints')
+
     logger = pl.loggers.WandbLogger(
         save_dir=args.logdir,
         project='ligand-pocket-ddpm',
         group=args.run_name,
         # name=args.run_name,
-        # id=args.run_name,
-        # resume='must' if args.resume is not None else False,
+        id=run_id,
+        resume='must' if args.resume else None,
         tags=[args.wandb_params.tags],
         # entity=args.wandb_params.entity,
         mode=args.wandb_params.mode,
-        
+        log_model='all',
+        # checkpoint_name=ckpt_filename + '.ckpt'
     )
 
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
-        dirpath=Path(out_dir, 'checkpoints'),
-        filename="best-model-epoch={epoch:02d}",
-        monitor="loss/val",
-        # auto_insert_metric_name=False,
-        save_top_k=1,
-        save_last=True,
-        mode="min",
+        dirpath=ckpt_dir,
+        filename=ckpt_filename,
+        # filename="last-model-epoch={epoch:02d}",
+        # monitor="loss/val",
+        # save_top_k=1,
+        # save_last=True,
+        # mode="min",
+        every_n_epochs=1,
     )
 
     trainer = pl.Trainer(
@@ -121,7 +120,22 @@ if __name__ == "__main__":
         accelerator=args.acc
     )
 
-    trainer.fit(model=pl_module, ckpt_path=ckpt_path)
+    ckpt_path = None
+    if args.resume:
+        ckpt_fullpath = Path(checkpoint_callback.dirpath, ckpt_filename + '.ckpt')
 
-    # # run test set
-    # result = trainer.test(ckpt_path='best')
+        # local ckpt
+        if Path.exists(ckpt_fullpath):
+            ckpt_path = ckpt_fullpath
+
+        # wandb ckpt
+        elif logger.experiment.resumed:
+            e = logger.experiment.entity
+            p = logger.experiment.project
+            art = logger.experiment.use_artifact(f"{e}/{p}/model-{run_id}:v0", type="model")
+            wandb_ckpt_dir = art.download()
+            ckpt_path = Path(wandb_ckpt_dir, 'model.ckpt')
+        else:
+            raise FileNotFoundError("No checkpoint to resume. Consider `resume`: False")
+
+    trainer.fit(model=pl_module, ckpt_path=ckpt_path)
