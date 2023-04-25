@@ -78,7 +78,7 @@ if __name__ == "__main__":
         visualize_chain_epoch=args.visualize_chain_epoch,
         auxiliary_loss=args.auxiliary_loss,
         loss_params=args.loss_params,
-        # mode=args.mode,
+        mode=args.mode,
         node_histogram=histogram,
         pocket_representation=args.pocket_representation
     )
