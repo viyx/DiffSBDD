@@ -100,6 +100,9 @@ if __name__ == "__main__":
         # checkpoint_name=ckpt_filename + '.ckpt'
     )
 
+    if args.wandb_params.mode != 'disabled':
+        Path.mkdir(Path(args.logdir, 'wandb'), exist_ok=True)
+
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
         dirpath=ckpt_dir,
         filename=ckpt_filename,
