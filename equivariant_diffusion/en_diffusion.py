@@ -21,7 +21,8 @@ class EnVariationalDiffusion(nn.Module):
             n_dims: int, size_histogram: Dict,
             timesteps: int = 1000, parametrization='eps',
             noise_schedule='learned', noise_precision=1e-4,
-            loss_type='vlb', norm_values=(1., 1.), norm_biases=(None, 0.)):
+            loss_type='vlb', norm_values=(1., 1.), norm_biases=(None, 0.),
+            noise_x=True):
         super().__init__()
 
         assert loss_type in {'vlb', 'l2'}
@@ -53,6 +54,7 @@ class EnVariationalDiffusion(nn.Module):
 
         self.norm_values = norm_values
         self.norm_biases = norm_biases
+        self.noise_x = noise_x
         self.register_buffer('buffer', torch.zeros(1))
 
         #  distribution of nodes
@@ -297,6 +299,7 @@ class EnVariationalDiffusion(nn.Module):
 
     def noised_representation(self, xh_lig, xh_pocket, lig_mask, pocket_mask,
                               gamma_t):
+        assert False, "noise_x parameter does not supported. See ConditionalDDPM.noised_representation"
         # Compute alpha_t and sigma_t from gamma.
         alpha_t = self.alpha(gamma_t, xh_lig)
         sigma_t = self.sigma(gamma_t, xh_lig)

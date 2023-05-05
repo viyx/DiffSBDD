@@ -146,6 +146,7 @@ class ARCLigandPocketDDPM(pl.LightningModule):
                 loss_type=diffusion_params.diffusion_loss_type,
                 norm_values=diffusion_params.normalize_factors,
                 size_histogram=node_histogram,
+                noise_x=diffusion_params.noise_x,
             )
 
         self.auxiliary_loss = auxiliary_loss

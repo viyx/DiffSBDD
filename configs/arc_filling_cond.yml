@@ -47,6 +47,7 @@ diffusion_params:
   diffusion_noise_precision: 1.0e-5
   diffusion_loss_type: 'l2'
   normalize_factors: [1, 4]  # [x, h]
+  noise_x: True
 
 eval_epochs: 25000
 visualize_sample_epoch: 1
