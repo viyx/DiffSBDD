@@ -166,9 +166,17 @@ class ConditionalDDPM(EnVariationalDiffusion):
             size=(len(lig_mask), self.n_dims + self.atom_nf),
             device=lig_mask.device)
 
-        # Sample z_t given x, h for timestep t, from q(z_t | x, h)
-        z_t_lig = alpha_t[lig_mask] * xh_lig + sigma_t[lig_mask] * eps_lig
-
+        noise_x = False
+        if noise_x:
+             # Sample z_t given x, h for timestep t, from q(z_t | x, h)
+            z_t_lig = alpha_t[lig_mask] * xh_lig + sigma_t[lig_mask] * eps_lig
+        else:
+            eps_lig[:, :self.n_dims] = 0
+            # Sample z_t given x, h for timestep t, from q(z_t | x, h)
+            z_t_lig = xh_lig
+            z_t_lig[:,self.n_dims:] = alpha_t[lig_mask] * xh_lig[:,self.n_dims:]
+            z_t_lig = z_t_lig + sigma_t[lig_mask] * eps_lig
+       
         # project to COM-free subspace
         xh_pocket = xh0_pocket.detach().clone()
         z_t_lig[:, :self.n_dims], xh_pocket[:, :self.n_dims] = \
