@@ -55,6 +55,9 @@ if __name__ == "__main__":
     if args.wandb_params.run_id and not args.resume:
         raise ValueError('Cannot use runid explicitly without resuming.')
 
+    if args.wandb_params.mode != 'disabled':
+        Path.mkdir(Path(args.logdir, 'wandb'), exist_ok=True, parents=True)
+
     run_id = args.wandb_params.run_id or wandb.util.generate_id()
     out_dir = Path(args.logdir, args.run_name, run_id)
 
@@ -100,8 +103,7 @@ if __name__ == "__main__":
         # checkpoint_name=ckpt_filename + '.ckpt'
     )
 
-    if args.wandb_params.mode != 'disabled':
-        Path.mkdir(Path(args.logdir, 'wandb'), exist_ok=True)
+
 
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
         dirpath=ckpt_dir,

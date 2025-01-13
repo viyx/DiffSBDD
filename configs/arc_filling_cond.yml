@@ -2,9 +2,9 @@ run_name: 'arc_filling_cond'
 logdir: './logs/'
 resume: False
 wandb_params:
-  mode: 'online' #'online'  # disabled, offline, online
-  tags: 'colab'
-  run_id: 
+  mode: 'offline' #'online'  # disabled, offline, online
+  tags: 'mac'
+  run_id:
 dataset: 'arc_filling'
 datadir: './data/arc/'
 enable_progress_bar: True
@@ -30,9 +30,9 @@ loss_params:
 egnn_params:
   # device: 'gpu'
   edge_cutoff: 7.0
-  joint_nf: 32
-  hidden_nf: 128
-  n_layers: 2
+  joint_nf: 16
+  hidden_nf: 16
+  n_layers: 1
   attention: True
   tanh: True
   norm_constant: 1
@@ -47,7 +47,7 @@ diffusion_params:
   diffusion_noise_precision: 1.0e-5
   diffusion_loss_type: 'l2'
   normalize_factors: [1, 4]  # [x, h]
-  noise_x: True
+  noise_x: False
 
 eval_epochs: 25000
 visualize_sample_epoch: 1
