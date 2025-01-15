@@ -2,7 +2,7 @@ run_name: 'arc_filling_cond'
 logdir: './logs/'
 resume: False
 wandb_params:
-  mode: 'offline' #'online'  # disabled, offline, online
+  mode: 'disabled' #'online'  # disabled, offline, online
   tags: 'mac'
   run_id:
 dataset: 'arc_filling'
