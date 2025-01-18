@@ -1,0 +1,21 @@
+# Install: mamba env create -n diffsbdd -f conda.yml
+# Export: conda env export --from-history > conda.yml
+channels:
+  - conda-forge
+  - pyg
+  - anaconda
+dependencies:
+  - python=3.11
+  - pytorch-lightning
+  - ca-certificates
+  - openssl
+  - wandb
+  - certifi
+  - rdkit
+  - biopython=1.79
+  - imageio
+  - scipy
+  - matplotlib
+  - pytorch-scatter
+  - openbabel
+  - seaborn

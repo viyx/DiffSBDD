@@ -1,9 +1,13 @@
 import os
+import pathlib
 import pickle
 import argparse
 from collections import Counter
 
 import numpy as np
+
+# small dataset, for debug purposes
+# python generate_arc.py --n 100 --width 10 --height 10 --folder ./data/arc/small/
 
 
 if __name__ == '__main__':
@@ -68,12 +72,12 @@ if __name__ == '__main__':
 
     os.makedirs(data_folder, exist_ok=True)
     for fname, ds in zip(['train', 'val', 'test'], [train, val, test]):
-        with open(data_folder + fname + '.pkl', 'wb') as f:
+        with open(pathlib.Path(data_folder, fname+'.pkl'), 'wb') as f:
             pickle.dump(ds, f)
 
     joint_histogram = np.zeros((height * width + 1, height * width + 1))
     joint_histogram[-1,-1] = 100
-    np.save(data_folder + '/size_distribution.npy', joint_histogram)
+    np.save(pathlib.Path(data_folder, 'size_distribution.npy'), joint_histogram)
 
     atom_hist = Counter()
     aa_hist = Counter()
@@ -84,3 +88,4 @@ if __name__ == '__main__':
 
     print(aa_hist)
     print(atom_hist)
+    print("Put this data into constants.py")

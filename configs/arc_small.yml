@@ -1,12 +1,12 @@
-run_name: 'arc_filling_cond'
+run_name: 'arc_small'
 logdir: './logs/'
 resume: False
 wandb_params:
   mode: 'disabled' #'online'  # disabled, offline, online
   tags: 'mac'
   run_id:
-dataset: 'arc_filling'
-datadir: './data/arc/'
+dataset: 'arc_small'
+datadir: './data/arc/small'
 enable_progress_bar: True
 num_sanity_val_steps: 0
 
@@ -14,8 +14,8 @@ mode: 'pocket_conditioning'
 pocket_representation: 'full-atom'
 batch_size: 32
 lr: 1.0e-4
-n_epochs: 1000
-num_workers: 2
+n_epochs: 10
+num_workers: 4
 acc: 'gpu'
 clip_grad: True
 augment_rotation: False
@@ -30,10 +30,10 @@ loss_params:
 egnn_params:
   # device: 'gpu'
   edge_cutoff: 7.0
-  joint_nf: 16
-  hidden_nf: 16
+  joint_nf: 8
+  hidden_nf: 8
   n_layers: 1
-  attention: True
+  attention: False
   tanh: True
   norm_constant: 1
   inv_sublayers: 1
@@ -49,12 +49,12 @@ diffusion_params:
   normalize_factors: [1, 4]  # [x, h]
   noise_x: False
 
-eval_epochs: 25000
+eval_epochs: 1
 visualize_sample_epoch: 1
 visualize_chain_epoch: 1
 eval_params:
-  n_eval_samples: 100
-  eval_batch_size: 1
-  smiles_file: './data/arc/'
+  n_eval_samples: 10
+  eval_batch_size: 2
+  smiles_file: './data/arc/small'
   n_visualize_samples: 2
   keep_frames: 10
