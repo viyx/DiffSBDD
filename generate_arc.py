@@ -47,6 +47,7 @@ if __name__ == '__main__':
         np.array([[1,1,1,1,1,1,1],[1,2,2,2,2,2,1],[1,1,1,1,1,1,1]])
     ]
 
+    np.random.seed(42)
     data = []
 
     for i in tqdm.trange(n):
