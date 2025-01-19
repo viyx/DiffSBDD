@@ -2,11 +2,11 @@ run_name: 'arc_cond'
 logdir: './logs/'
 resume: False
 wandb_params:
-  mode: 'online' #'online'  # disabled, offline, online
+  mode: 'disabled' #'online'  # disabled, offline, online
   tags: 'mac'
   run_id:
 dataset: 'arc_filling'
-datadir: './data/arc/'
+datadir: './data/arc/1M'
 enable_progress_bar: True
 num_sanity_val_steps: 0
 
@@ -55,6 +55,6 @@ visualize_chain_epoch: 1
 eval_params:
   n_eval_samples: 100
   eval_batch_size: 1
-  smiles_file: './data/arc/'
+  smiles_file: './data/arc/1M'
   n_visualize_samples: 2
   keep_frames: 10

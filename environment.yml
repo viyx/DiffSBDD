@@ -1,5 +1,5 @@
-# Install: mamba env create -n diffsbdd -f conda.yml
-# Export: conda env export --from-history > conda.yml
+# Install: mamba env create -n name -f environment.yml
+# Export: conda env export --from-history > environment.yml
 channels:
   - conda-forge
   - pyg
@@ -16,6 +16,6 @@ dependencies:
   - imageio
   - scipy
   - matplotlib
-  - pytorch-scatter
+  - torch-scatter
   - openbabel
   - seaborn
