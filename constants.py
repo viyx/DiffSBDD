@@ -191,6 +191,8 @@ dataset_params['arc_filling'] = {
       'atom_hist': {'0': 183798882, '1': 33087000, '2': 8114118},
       'aa_hist': {'0': 191913000, '1': 33087000},
       'x_dims': 2,
+      'grid_width': 15,
+      'grid_height': 15,
 }
 
 dataset_params['arc_small'] = {
@@ -217,6 +219,8 @@ dataset_params['arc_small'] = {
       'atom_hist': {'0': 8263, '1': 1472, '2': 265},
       'aa_hist': {'0': 8528, '1': 1472},
       'x_dims': 2,
+      'grid_width': 10,
+      'grid_height': 10,
 }
 
 dataset_params['crossdock'] = {

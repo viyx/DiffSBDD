@@ -20,7 +20,7 @@ from equivariant_diffusion.conditional_model import ConditionalDDPM, \
     SimpleConditionalDDPM
 from dataset import ProcessedLigandPocketDataset, ARCFillingDataset
 import utils
-from analysis.visualization import save_x_file, visualize, visualize2d, visualize_chain
+from analysis.visualization import save_xyz_file, visualize, visualize2d, visualize_chain
 from analysis.metrics import check_stability, BasicMolecularMetrics, \
     CategoricalDistribution
 from analysis.molecule_builder import build_molecule, process_molecule
@@ -372,7 +372,7 @@ class ARCLigandPocketDDPM(pl.LightningModule):
         one_hot = torch.cat((xh_lig[:, self.x_dims:], one_hot_pocket), dim=0)
 
         outdir = Path(self.outdir, f'epoch_{self.current_epoch}')
-        save_x_file(str(outdir) + '/', one_hot, x, self.dataset_info,
+        save_xyz_file(str(outdir) + '/', one_hot, x, self.dataset_info,
                     name='molecule',
                     batch_mask=torch.cat((lig_mask, pocket_mask)))
         # visualize(str(outdir), dataset_info=self.dataset_info, wandb=wandb)
@@ -404,7 +404,7 @@ class ARCLigandPocketDDPM(pl.LightningModule):
             one_hot = torch.cat((xh_lig[:, self.x_dims:], one_hot_pocket), dim=0)
 
             outdir = Path(self.outdir, f'epoch_{self.current_epoch}')
-            save_x_file(str(outdir) + '/', one_hot, x, self.dataset_info,
+            save_xyz_file(str(outdir) + '/', one_hot, x, self.dataset_info,
                         name='molecule_'+suffix,
                         batch_mask=torch.cat((lig_mask, pocket_mask)))
             visualize2d(str(outdir), dataset_info=self.dataset_info)
