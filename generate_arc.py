@@ -56,46 +56,59 @@ if __name__ == "__main__":
     atom_hist = Counter()
     aa_hist = Counter()
 
+    hashes = set()
     for i in tqdm.trange(n, desc="Generating data"):
-        # Randomly select number of figures and their types
-        n_figs = np.random.randint(1, max_figs + 1)
-        sample_ind = np.random.choice(len(predefined_figs), n_figs, replace=True)
-        sample_figs = [predefined_figs[ind] for ind in sample_ind]
+        i1 = 0
+        while(i1 < 1000):
+            i1+=1
+            # Randomly select number of figures and their types
+            n_figs = np.random.randint(1, max_figs + 1)
+            sample_ind = np.random.choice(len(predefined_figs), n_figs, replace=True)
+            sample_figs = [predefined_figs[ind] for ind in sample_ind]
 
-        # Randomly flip figures if specified
-        if flip:
-            for j, fig in enumerate(sample_figs):
-                if np.random.binomial(1, 0.5):  # 50% chance to flip
-                    sample_figs[j] = fig.T
+            # Randomly flip figures if specified
+            if flip:
+                for j, fig in enumerate(sample_figs):
+                    if np.random.binomial(1, 0.5):  # 50% chance to flip
+                        sample_figs[j] = fig.T
 
-        # Create an empty grid
-        y = np.zeros((height, width), dtype=np.int64)
+            # Create an empty grid
+            y = np.zeros((height, width), dtype=np.int64)
 
-        # Place figures on the grid
-        for fig in sample_figs:
-            h, w = fig.shape
-            i = 0
-            while i < 1000:
-                i += 1
-                x_coord = np.random.randint(0, width - h + 1)
-                y_coord = np.random.randint(0, height - w + 1)
-                if no_overlap and not np.all(y[x_coord: x_coord + h, y_coord: y_coord + w] == 0):
-                    continue
-                y[x_coord: x_coord + h, y_coord: y_coord + w] = fig
-                break
+            # Place figures on the grid
+            for fig in sample_figs:
+                h, w = fig.shape
+                i2 = 0
+                # while no_overlap
+                while i2 < 1000:
+                    i2 += 1
+                    fig_x = np.random.randint(0, width - h + 1)
+                    fig_y = np.random.randint(0, height - w + 1)
+                    if no_overlap and not np.all(y[fig_x: fig_x + h, fig_y: fig_y + w] == 0):
+                        continue
+                    y[fig_x: fig_x + h, fig_y: fig_y + w] = fig
+                    break
+            if yh := str(y) in hashes:
+                continue  # try new grid
+            hashes.add(yh)
 
-        # remove fill from figures
-        x = y.copy()
-        x[x == 2] = 0
-        aa_hist.update(x.flatten())
-        atom_hist.update(y.flatten())
-        data.append({"x": x, "y": y})
+            # remove fill from figures
+            x = y.copy()
+            x[x == 2] = 0
+            aa_hist.update(x.flatten())
+            atom_hist.update(y.flatten())
+            data.append({"x": x, "y": y})
+            break
 
     train_size = int(0.8 * len(data))
     val_size = int(0.1 * len(data))
     test_size = len(data) - train_size - val_size
 
-    train, val, test = data[:train_size], data[train_size : train_size + val_size], data[-test_size:]
+    train = data[:train_size]
+    val = data[train_size : train_size + val_size]
+    test = data[-test_size:]
+    print(f"Counts: train={len(train)}, val={len(val)}, test={len(test)}",
+          f"Sum={len(train)+len(val)+len(test)}")
 
     os.makedirs(data_folder, exist_ok=True)
     for fname, ds in zip(["train", "val", "test"], [train, val, test]):

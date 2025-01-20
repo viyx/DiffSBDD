@@ -2,11 +2,11 @@ run_name: 'arc_cond'
 logdir: './logs/'
 resume: False
 wandb_params:
-  mode: 'disabled' #'online'  # disabled, offline, online
-  tags: 'mac'
+  mode: 'online' #'online'  # disabled, offline, online
+  tags: 'colab'
   run_id:
 dataset: 'arc_filling'
-datadir: './data/arc/1M'
+datadir: './data/arc/100K'
 enable_progress_bar: True
 num_sanity_val_steps: 0
 
@@ -14,7 +14,7 @@ mode: 'pocket_conditioning'
 pocket_representation: 'full-atom'
 batch_size: 32
 lr: 1.0e-4
-n_epochs: 1000
+n_epochs: 100
 num_workers: 2
 acc: 'gpu'
 clip_grad: True
@@ -30,9 +30,9 @@ loss_params:
 egnn_params:
   # device: 'gpu'
   edge_cutoff: 7.0
-  joint_nf: 16
-  hidden_nf: 16
-  n_layers: 1
+  joint_nf: 32
+  hidden_nf: 128
+  n_layers: 2
   attention: True
   tanh: True
   norm_constant: 1
@@ -42,14 +42,14 @@ egnn_params:
   normalization_factor: 100  # used if aggregation_method='sum'
 
 diffusion_params:
-  diffusion_steps: 10
+  diffusion_steps: 100
   diffusion_noise_schedule: 'polynomial_2'
   diffusion_noise_precision: 1.0e-5
   diffusion_loss_type: 'l2'
   normalize_factors: [1, 4]  # [x, h]
   noise_x: False
 
-eval_epochs: 5
+eval_epochs: 1
 visualize_sample_epoch: 1
 visualize_chain_epoch: 1
 eval_params:

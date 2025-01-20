@@ -140,6 +140,6 @@ if __name__ == "__main__":
             wandb_ckpt_dir = art.download()
             ckpt_path = Path(wandb_ckpt_dir, 'model.ckpt')
         else:
-            raise FileNotFoundError("No checkpoint to resume. Consider `resume`: False")
+            raise FileNotFoundError("There's no checkpoint to resume. Maybe set `resume=False`?")
 
     trainer.fit(model=pl_module, ckpt_path=ckpt_path)
