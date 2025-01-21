@@ -16,7 +16,7 @@ batch_size: 32
 lr: 1.0e-4
 n_epochs: 10
 num_workers: 4
-acc: 'gpu'
+acc: 'cpu'
 clip_grad: True
 augment_rotation: False
 augment_noise: 0
@@ -53,8 +53,5 @@ eval_epochs: 1
 visualize_sample_epoch: 1
 visualize_chain_epoch: 1
 eval_params:
-  n_eval_samples: 10
-  eval_batch_size: 2
-  smiles_file: './data/arc/small'
+  eval_batch_size: 1
   n_visualize_samples: 2
-  keep_frames: 10
