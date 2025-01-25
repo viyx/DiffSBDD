@@ -102,7 +102,7 @@ class ARCFillingDataset(Dataset):
         lig_one_hot = []
         num_lig_atoms = []
 
-
+        # TODO: change ligand to diff=(y-x)
         for i, pair in enumerate(batch):
             x, y = pair['x'], pair['y']
             x_flat, y_flat = x.flatten(), y.flatten()

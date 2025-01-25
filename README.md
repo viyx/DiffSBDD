@@ -1,3 +1,9 @@
+# DiffSBDD + ARC-AGI: Applying Structure-based Drug Design with Equivariant Diffusion Models to ARC-AGI Challenge:
+
+In this project, I interpret a subset of ARC tasks as a drug-design problem. Specifically, tasks where new objects are introduced or edited in the grid can be viewed as analogous to pocket-ligand docking. In this analogy, the input grid represents the pocket, and the ligand corresponds to the difference between the input and output grids.
+
+Since training deep neural networks is a data-intensive process, a synthetic dataset was created based on a single concept: filling holes in shapes with one color. However, the results so far have been unimpressive, suggesting the need to rethink the dataset's distribution and improve error-checking processes.
+
 # DiffSBDD: Structure-based Drug Design with Equivariant Diffusion Models
 
 Official implementation of **DiffSBDD**, an equivariant model for structure-based drug design, by Arne Schneuing*, Yuanqi Du*, Charles Harris, Arian Jamasb, Ilia Igashov, Weitao Du, Tom Blundell, Pietro Lió, Carla Gomes, Max Welling, Michael Bronstein & Bruno Correia.
