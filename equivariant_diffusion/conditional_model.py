@@ -166,14 +166,14 @@ class ConditionalDDPM(EnVariationalDiffusion):
             size=(len(lig_mask), self.n_dims + self.atom_nf),
             device=lig_mask.device)
 
-        if self.noise_x:
+        # if self.noise_x:
              # Sample z_t given x, h for timestep t, from q(z_t | x, h)
-            z_t_lig = alpha_t[lig_mask] * xh_lig + sigma_t[lig_mask] * eps_lig
-        else:
-            eps_lig[:, :self.n_dims] = 0
-            z_t_lig = xh_lig
-            z_t_lig[:,self.n_dims:] = alpha_t[lig_mask] * xh_lig[:,self.n_dims:]
-            z_t_lig = z_t_lig + sigma_t[lig_mask] * eps_lig
+        z_t_lig = alpha_t[lig_mask] * xh_lig + sigma_t[lig_mask] * eps_lig
+        # else:
+        #     eps_lig[:, :self.n_dims] = 0
+        #     z_t_lig = xh_lig
+        #     z_t_lig[:,self.n_dims:] = alpha_t[lig_mask] * xh_lig[:,self.n_dims:]
+        #     z_t_lig = z_t_lig + sigma_t[lig_mask] * eps_lig
        
         # project to COM-free subspace
         xh_pocket = xh0_pocket.detach().clone()
@@ -418,8 +418,8 @@ class ConditionalDDPM(EnVariationalDiffusion):
         mu_lig_x = scatter_mean(pocket['x'], pocket['mask'], dim=0)
         mu_lig_h = torch.zeros((n_samples, self.atom_nf), device=device)
         mu_lig = torch.cat((mu_lig_x, mu_lig_h), dim=1)[lig_mask]
-        if not self.noise_x:
-            mu_lig[:,:self.n_dims] = pocket['x']
+        # if not self.noise_x:
+            # mu_lig[:,:self.n_dims] = pocket['x']
         sigma = torch.ones_like(pocket['size']).unsqueeze(1)
 
         z_lig, xh_pocket = self.sample_normal_zero_com(

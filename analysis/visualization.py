@@ -243,6 +243,24 @@ def plot_arc(positions, atom_type, dataset_info, save_path):
     plt.close()
 
 
+def plot_arc_new(positions, atom_type, dataset_info, save_path):
+    w, h = dataset_info['grid_width'], dataset_info['grid_width']
+    n_x = w * h
+    n_y = len(positions) - n_x
+    pocket = positions[n_y:]
+    lig = positions[:n_y]
+
+    cmap = colors.ListedColormap(dataset_info['colors_dic'])
+    norm = colors.Normalize(vmin=0, vmax=len(dataset_info['colors_dic']))
+    _, axs = plt.subplots(1, 2, figsize=(3 * 2, 3 * 1))
+    axs[0].set_title("x")
+    axs[1].set_title("y")
+    axs[0].scatter(pocket[:, 0], pocket[:, 1], c=atom_type[n_y:], cmap=cmap, norm=norm)
+    axs[1].scatter(lig[:, 0], lig[:, 1], c=atom_type[:n_y], cmap=cmap, norm=norm)
+    plt.savefig(save_path)
+    plt.close()
+
+
 def plot_data3d_uncertainty(
         all_positions, all_atom_types, dataset_info, camera_elev=0,
         camera_azim=0,
@@ -367,12 +385,12 @@ def visualize2d(path, dataset_info, max_num=25):
     for file in files:
         positions, one_hot = load_molecule_xyz(file, dataset_info)
         atom_type = torch.argmax(one_hot, dim=1).numpy()
-        dists = torch.cdist(positions.unsqueeze(0),
-                            positions.unsqueeze(0)).squeeze(0)
-        dists = dists[dists > 0]
+        # dists = torch.cdist(positions.unsqueeze(0),
+                            # positions.unsqueeze(0)).squeeze(0)
+        # dists = dists[dists > 0]
         # print("Average distance between atoms", dists.mean().item())
         fname = file[:-4] + '.png'
-        plot_arc(positions, atom_type, dataset_info=dataset_info,
+        plot_arc_new(positions, atom_type, dataset_info=dataset_info,
                             save_path=fname)
 
         # Log image(s)

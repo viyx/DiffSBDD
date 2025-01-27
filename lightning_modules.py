@@ -89,14 +89,14 @@ class ARCLigandPocketDDPM(pl.LightningModule):
         #     else np.load(eval_params.smiles_file)
         # self.ligand_metrics = BasicMolecularMetrics(self.dataset_info,
         #                                             smiles_list)
-        self.ligand_type_distribution = CategoricalDistribution(
-            self.dataset_info['atom_hist'], self.dataset_info['atom_encoder'])
-        if self.pocket_representation == 'CA':
-            self.pocket_type_distribution = CategoricalDistribution(
-                self.dataset_info['aa_hist'], self.dataset_info['aa_encoder'])
-        else:
-            # TODO: full-atom case
-            self.pocket_type_distribution = None
+        # self.ligand_type_distribution = CategoricalDistribution(
+        #     self.dataset_info['atom_hist'], self.dataset_info['atom_encoder'])
+        # if self.pocket_representation == 'CA':
+        #     self.pocket_type_distribution = CategoricalDistribution(
+        #         self.dataset_info['aa_hist'], self.dataset_info['aa_encoder'])
+        # else:
+        #     # TODO: full-atom case
+        #     self.pocket_type_distribution = None
 
         self.train_dataset = None
         self.val_dataset = None
@@ -388,21 +388,58 @@ class ARCLigandPocketDDPM(pl.LightningModule):
             ligand, pocket = self.get_ligand_and_pocket(batch)
 
             num_nodes_lig = self.ddpm.size_distribution.sample_conditional(
-                n1=None, n2=pocket['size'])
+                n1=pocket['size'], n2=None)
 
             xh_lig, xh_pocket, lig_mask, pocket_mask = \
                 self.ddpm.sample_given_pocket(pocket, num_nodes_lig, return_frames=1)
 
             x_pocket, one_hot_pocket = \
-                xh_pocket[:, :self.x_dims], ligand['one_hot']
+                xh_pocket[:, :self.x_dims], xh_pocket[:, self.x_dims:]
             x = torch.cat((xh_lig[:, :self.x_dims], x_pocket), dim=0)
             one_hot = torch.cat((xh_lig[:, self.x_dims:], one_hot_pocket), dim=0)
+
+            # x_pocket, one_hot_pocket = \
+            #     xh_pocket[:, :self.x_dims], ligand['one_hot']
+            # x = torch.cat((xh_lig[:, :self.x_dims], x_pocket), dim=0)
+            # one_hot = torch.cat((xh_lig[:, self.x_dims:], one_hot_pocket), dim=0)
 
             outdir = Path(self.outdir, f'epoch_{self.current_epoch}')
             save_xyz_file(str(outdir) + '/', one_hot, x, self.dataset_info,
                         name='molecule_'+suffix,
                         batch_mask=torch.cat((lig_mask, pocket_mask)))
             visualize2d(str(outdir), dataset_info=self.dataset_info)
+
+
+#     def sample_and_save_given_pocket(self, n_samples):
+#         batch = self.val_dataset.collate_fn(
+#             [self.val_dataset[i] for i in torch.randint(len(self.val_dataset),
+#                                                         size=(n_samples,))]
+#         )
+#         ligand, pocket = self.get_ligand_and_pocket(batch)
+
+#         num_nodes_lig = self.ddpm.size_distribution.sample_conditional(
+#             n1=None, n2=pocket['size'])
+
+#         xh_lig, xh_pocket, lig_mask, pocket_mask = \
+#             self.ddpm.sample_given_pocket(pocket, num_nodes_lig)
+
+#         if self.pocket_representation == 'CA':
+#             # convert residues into atom representation for visualization
+#             x_pocket, one_hot_pocket = utils.residues_to_atoms(
+#                 xh_pocket[:, :self.x_dims], self.dataset_info)
+#         else:
+#             x_pocket, one_hot_pocket = \
+#                 xh_pocket[:, :self.x_dims], xh_pocket[:, self.x_dims:]
+#         x = torch.cat((xh_lig[:, :self.x_dims], x_pocket), dim=0)
+#         one_hot = torch.cat((xh_lig[:, self.x_dims:], one_hot_pocket), dim=0)
+
+#         outdir = Path(self.outdir, f'epoch_{self.current_epoch}')
+#         save_coords_file(str(outdir) + '/', one_hot, x, self.dataset_info,
+#                       name='molecule',
+#                       batch_mask=torch.cat((lig_mask, pocket_mask)))
+#         # visualize(str(outdir), dataset_info=self.dataset_info, wandb=wandb)
+#         visualize(str(outdir), dataset_info=self.dataset_info, wandb=None)
+
 
     def on_validation_epoch_end(self):
         # Perform validation on single GPU

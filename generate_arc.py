@@ -44,23 +44,25 @@ if __name__ == "__main__":
     data_folder = args.folder
 
     # Predefined figures
+    fill = 2
     predefined_figs = [
-        np.array([[1, 1, 1], [1, 2, 1], [1, 1, 1]]),
-        np.array([[1, 1, 1, 1, 1], [1, 2, 2, 2, 1], [1, 1, 1, 1, 1]]),
-        np.array([[1, 1, 1, 1, 1, 1, 1], [1, 1, 2, 2, 2, 2, 1], [1, 1, 1, 1, 1, 1, 1]]),
-        np.array([[1, 1, 1, 1, 1, 1, 1], [1, 2, 2, 2, 2, 2, 1], [1, 1, 1, 1, 1, 1, 1]]),
+        np.array([[1, 1, 1], [1, fill, 1], [1, 1, 1]]),
+        np.array([[1, 1, 1, 1, 1], [1, fill, fill, fill, 1], [1, 1, 1, 1, 1]]),
+        np.array([[1, 1, 1, 1, 1, 1, 1], [1, 1, fill, fill, fill, fill, 1], [1, 1, 1, 1, 1, 1, 1]]),
+        np.array([[1, 1, 1, 1, 1, 1, 1], [1, fill, fill, fill, fill, fill, 1], [1, 1, 1, 1, 1, 1, 1]]),
     ]
 
     np.random.seed(42)
     data = []
-    atom_hist = Counter()
-    aa_hist = Counter()
+    # atom_hist = Counter()
+    # y_hist = Counter()
+    joint_hist = np.zeros((height * width + 1, height * width + 1))
 
     hashes = set()
     for i in tqdm.trange(n, desc="Generating data"):
         i1 = 0
-        while(i1 < 1000):
-            i1+=1
+        while i1 < 1000:
+            i1 += 1
             # Randomly select number of figures and their types
             n_figs = np.random.randint(1, max_figs + 1)
             sample_ind = np.random.choice(len(predefined_figs), n_figs, replace=True)
@@ -92,12 +94,17 @@ if __name__ == "__main__":
                 continue  # try new grid
             hashes.add(yh)
 
-            # remove fill from figures
             x = y.copy()
-            x[x == 2] = 0
-            aa_hist.update(x.flatten())
-            atom_hist.update(y.flatten())
-            data.append({"x": x, "y": y})
+            # remove fill from figures
+            x[x == fill] = 0
+            x_nodes = x.shape[0] * x.shape[1]
+            y_nodes = np.sum(y == fill)
+            joint_hist[x_nodes, y_nodes] += 1
+            x_coords = np.vstack(np.where(x >= 0)).T
+            y_coords = np.vstack(np.where(y == fill)).T
+            #  extract only fiiled areas from y
+            data.append({"x": x, "x_coords": x_coords,
+                         "y": np.full(y_nodes, fill), "y_coords": y_coords})
             break
 
     train_size = int(0.8 * len(data))
@@ -105,7 +112,7 @@ if __name__ == "__main__":
     test_size = len(data) - train_size - val_size
 
     train = data[:train_size]
-    val = data[train_size : train_size + val_size]
+    val = data[train_size: train_size + val_size]
     test = data[-test_size:]
     print(f"Counts: train={len(train)}, val={len(val)}, test={len(test)}",
           f"Sum={len(train)+len(val)+len(test)}")
@@ -115,10 +122,8 @@ if __name__ == "__main__":
         with open(pathlib.Path(data_folder, f"{fname}.pkl"), "wb") as f:
             pickle.dump(ds, f)
 
-    # Save the size distribution histogram
-    joint_histogram = np.zeros((height * width + 1, height * width + 1))
-    joint_histogram[-1, -1] = width * height  # Hardcoded to sample constant #nodes
-    np.save(pathlib.Path(data_folder, "size_distribution.npy"), joint_histogram)
+    print("Joint histogram", joint_hist[width*height])
+    np.save(pathlib.Path(data_folder, "size_distribution.npy"), joint_hist)
 
 
     # atom_hist = Counter()
@@ -127,6 +132,6 @@ if __name__ == "__main__":
     #     aa_hist.update(d["x"])
     #     atom_hist.update(d["y"])
 
-    print("Input (x) value histogram:", aa_hist)
-    print("Output (y) value histogram:", atom_hist)
-    print("Put this data into constants.py")
+    # print("Input (x) value histogram:", aa_hist)
+    # print("Output (y) value histogram:", atom_hist)
+    # print("Put this data into constants.py")

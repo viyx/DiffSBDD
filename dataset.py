@@ -105,13 +105,14 @@ class ARCFillingDataset(Dataset):
         # TODO: change ligand to diff=(y-x)
         for i, pair in enumerate(batch):
             x, y = pair['x'], pair['y']
+            x_coords, y_coords = pair['x_coords'], pair['y_coords']
             x_flat, y_flat = x.flatten(), y.flatten()
 
             pocket_mask.append(i * torch.ones(len(x_flat)))
             lig_mask.append(i * torch.ones(len(y_flat)))
 
-            pocket_c_alpha.append(torch.cartesian_prod(torch.arange(0,x.shape[0]), torch.arange(0,x.shape[1])))
-            lig_coords.append(torch.cartesian_prod(torch.arange(0,x.shape[0]), torch.arange(0,x.shape[1])))
+            pocket_c_alpha.append(torch.tensor(x_coords))
+            lig_coords.append(torch.tensor(y_coords))
 
             pocket_one_hot.append(one_hot(torch.tensor(x_flat), len(self.categories)))
             lig_one_hot.append(one_hot(torch.tensor(y_flat), len(self.categories)))
