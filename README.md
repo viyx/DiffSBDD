@@ -1,9 +1,16 @@
 # DiffSBDD + ARC-AGI: Applying Structure-based Drug Design with Equivariant Diffusion Models to ARC-AGI Challenge:
 
-In this project, I interpret a subset of ARC tasks as a drug-design problem. Specifically, tasks where new objects are introduced or edited in the grid can be viewed as analogous to pocket-ligand docking. In this analogy, the input grid represents the pocket, and the ligand corresponds to the difference between the input and output grids.
+For execution, refer to *./colab/arc_colab.ipynb*
 
-Since training deep neural networks is a data-intensive process, a synthetic dataset was created based on a single concept: filling holes in shapes with one color. However, the results so far have been unimpressive, suggesting the need to rethink the dataset's distribution.
+In this toy-project, I interpret a subset of ARC tasks as a drug-design problem. Specifically, tasks where new objects are introduced or edited in the grid can be viewed as analogous to pocket-ligand docking. In this analogy, the input grid represents the pocket, and the ligand corresponds to the difference between the input and output grids.
 
+Since training deep neural networks is a data-intensive process, a synthetic dataset was created based on a single concept: *filling holes in shapes with one color*.
+
+"The example of a sample from the trained model is presented in Figure 1. The task here is to fill the blue shapes with the red atoms; 'x' data is used as context, and 'y' as the answer to the task. We can see that the number of molecules is smaller than needed, but their alignment and position are correct. Overall, the approach can be fine-tuned and requires more sampling and postprocessing, demanding a more suitable architecture of GNN (e.g., Topological NN) as well"
+
+<div align="center"><img src="./img/molecule_val.png"/><p>Figure 1. Sample of generation</p></div>
+
+# Source README:
 # DiffSBDD: Structure-based Drug Design with Equivariant Diffusion Models
 
 Official implementation of **DiffSBDD**, an equivariant model for structure-based drug design, by Arne Schneuing*, Yuanqi Du*, Charles Harris, Arian Jamasb, Ilia Igashov, Weitao Du, Tom Blundell, Pietro Lió, Carla Gomes, Max Welling, Michael Bronstein & Bruno Correia.
